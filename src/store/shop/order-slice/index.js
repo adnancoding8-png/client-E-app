@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { API_BASE_URL } from "@/config/api";
+import apiClient from "@/services/api-client";
 import { getErrorMessage } from "@/utils/error-handler";
 
 const initialState = {
@@ -16,8 +15,8 @@ export const createNewOrder = createAsyncThunk(
   "/order/createNewOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/shop/orders/create`,
+      const response = await apiClient.post(
+        "/api/shop/orders/create",
         orderData
       );
 
@@ -35,8 +34,8 @@ export const createUnifiedOrder = createAsyncThunk(
   "/order/createUnifiedOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/shop/orders/unified`,
+      const response = await apiClient.post(
+        "/api/shop/orders/unified",
         orderData
       );
 
@@ -54,8 +53,8 @@ export const capturePayment = createAsyncThunk(
   "/order/capturePayment",
   async ({ paymentId, payerId, orderId }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/shop/orders/capture`,
+      const response = await apiClient.post(
+        "/api/shop/orders/capture",
         {
           paymentId,
           payerId,
@@ -77,8 +76,8 @@ export const getAllOrdersByUserId = createAsyncThunk(
   "/order/getAllOrdersByUserId",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/shop/orders/list/${userId}`
+      const response = await apiClient.get(
+        `/api/shop/orders/list/${userId}`
       );
 
       return response.data;
@@ -95,8 +94,8 @@ export const getOrderDetails = createAsyncThunk(
   "/order/getOrderDetails",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/shop/orders/details/${id}`
+      const response = await apiClient.get(
+        `/api/shop/orders/details/${id}`
       );
 
       return response.data;

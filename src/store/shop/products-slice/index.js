@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { API_BASE_URL } from "@/config/api";
+import apiClient from "@/services/api-client";
 import { getErrorMessage } from "@/utils/error-handler";
 
 const initialState = {
@@ -21,8 +20,8 @@ export const fetchAllFilteredProducts = createAsyncThunk(
     });
 
     try {
-      const result = await axios.get(
-        `${API_BASE_URL}/api/shop/products/get?${query}`
+      const result = await apiClient.get(
+        `/api/shop/products/get?${query}`
       );
 
       console.log(result);
@@ -41,8 +40,8 @@ export const fetchProductDetails = createAsyncThunk(
   "/products/fetchProductDetails",
   async (id, { rejectWithValue }) => {
     try {
-      const result = await axios.get(
-        `${API_BASE_URL}/api/shop/products/get/${id}`
+      const result = await apiClient.get(
+        `/api/shop/products/get/${id}`
       );
 
       return result?.data;

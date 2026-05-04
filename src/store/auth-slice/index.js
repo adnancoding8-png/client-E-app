@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
-import { API_BASE_URL } from "@/config/api";
+import apiClient from "@/services/api-client";
 import { getErrorMessage } from "@/utils/error-handler";
 
 const initialState = {
@@ -14,23 +13,13 @@ const initialState = {
   profileError: null
 };
 
-// Common axios configuration
-const axiosConfig = {
-  withCredentials: true,
-  headers: {
-    "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
-    "Pragma": "no-cache"
-  }
-};
-
 export const registerUser = createAsyncThunk(
   "auth/register",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/auth/register`,
-        formData,
-        axiosConfig
+      const response = await apiClient.post(
+        "/api/auth/register",
+        formData
       );
       return response.data;
     } catch (error) {
@@ -46,16 +35,14 @@ export const loginUser = createAsyncThunk(
   "auth/login",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/auth/login`,
-        formData,
-        axiosConfig
+      const response = await apiClient.post(
+        "/api/auth/login",
+        formData
       );
       
       const { token } = response.data;
       if (token) {
-        localStorage.setItem('token', token);
-        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        localStorage.setItem('authToken', token);
       }
       
       return response.data;
@@ -72,13 +59,11 @@ export const logoutUserThunk = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${API_BASE_URL}/api/auth/logout`,
-        {},
-        axiosConfig
+      const response = await apiClient.post(
+        "/api/auth/logout",
+        {}
       );
-      localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
+      localStorage.removeItem('authToken');
       return response.data;
     } catch (error) {
       return rejectWithValue({
@@ -93,27 +78,17 @@ export const checkAuth = createAsyncThunk(
   "auth/checkAuth",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('authToken');
       if (!token) {
         throw new Error('No token found');
       }
 
-      const config = {
-        ...axiosConfig,
-        headers: {
-          ...axiosConfig.headers,
-          Authorization: `Bearer ${token}`
-        }
-      };
-
-      const response = await axios.get(
-        `${API_BASE_URL}/api/auth/check-auth`,
-        config
+      const response = await apiClient.get(
+        "/api/auth/check-auth"
       );
       return response.data;
     } catch (error) {
-      localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
+      localStorage.removeItem('authToken');
       return rejectWithValue({
         message: getErrorMessage(error),
         error: error,
@@ -126,9 +101,8 @@ export const fetchUserProfile = createAsyncThunk(
   "auth/fetchUserProfile",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/shop/profile/${userId}`,
-        axiosConfig
+      const response = await apiClient.get(
+        `/api/shop/profile/${userId}`
       );
       return response.data;
     } catch (error) {
@@ -144,10 +118,9 @@ export const updateUserProfile = createAsyncThunk(
   "auth/updateUserProfile",
   async ({ userId, profileData }, { rejectWithValue }) => {
     try {
-      const response = await axios.put(
-        `${API_BASE_URL}/api/shop/profile/${userId}`,
-        profileData,
-        axiosConfig
+      const response = await apiClient.put(
+        `/api/shop/profile/${userId}`,
+        profileData
       );
       return response.data;
     } catch (error) {
@@ -163,9 +136,8 @@ export const fetchUserStats = createAsyncThunk(
   "auth/fetchUserStats",
   async (userId, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/api/shop/profile/${userId}/stats`,
-        axiosConfig
+      const response = await apiClient.get(
+        `/api/shop/profile/${userId}/stats`
       );
       return response.data;
     } catch (error) {

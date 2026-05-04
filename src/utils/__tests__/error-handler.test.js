@@ -21,6 +21,7 @@ describe('Error Handler Utilities', () => {
     it('should return CORS error message for CORS errors', () => {
       const error = new Error('Network Error');
       error.corsError = true;
+      error.response = { status: 0 }; // Add response to distinguish from connection error
       
       const message = getErrorMessage(error);
       expect(message).toContain('Server configuration error');
